@@ -1,0 +1,4 @@
+{
+    "mesonbuild.configureOnOpen": false,
+    "C_Cpp.default.compileCommands": "/home/mg/00_Source/ray-tracer/debug/compile_commands.json"
+}
