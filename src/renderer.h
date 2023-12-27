@@ -43,8 +43,10 @@ class Renderer {
     constexpr Ray SampleRay(u32 i, u32 j) {
         auto pixel_centre = camera_.PixelToWorld(i, j);
 
-        pixel_centre += rand_.GenF64(-0.5, 0.5) * camera_.d_u_pixel();
-        pixel_centre += rand_.GenF64(-0.5, 0.5) * camera_.d_v_pixel();
+        Vec3 random_shift = rand_.GenF64(-0.5, 0.5) * camera_.d_u_pixel() +
+                            rand_.GenF64(-0.5, 0.5) * camera_.d_v_pixel();
+
+        pixel_centre += random_shift;
 
         auto ray_direction = pixel_centre - camera_.centre();
 
