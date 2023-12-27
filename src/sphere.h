@@ -4,6 +4,7 @@
 #include <cmath>
 #include <optional>
 
+#include "interval.h"
 #include "ray.h"
 #include "renderobject.h"
 #include "vec3.h"
@@ -18,7 +19,7 @@ class Sphere : public RenderObject {
     constexpr Point3 centre() const { return centre_; }
     constexpr double radius() const { return radius_; }
 
-    std::optional<HitRecord> hit(const Ray& ray, double t_min, double t_max) const override {
+    std::optional<HitRecord> hit(const Ray& ray, Interval ts) const override {
         HitRecord hit_record;
 
         Vec3 oc = ray.origin() - centre_;
@@ -39,19 +40,19 @@ class Sphere : public RenderObject {
         // smaller of the ts that hit the sphere
         double t = (-b_half - std::sqrt(discr)) / a;
 
-        if (t > t_max) {
+        if (t >= ts.max()) {
             // if the smaller t is already too large, we don't need to check the second one since it
             // will be even larger
 
             return std::nullopt;
         }
 
-        if (t < t_min) {
+        if (t <= ts.min()) {
             // if the smaller t is too small, check the larger one
 
             t = (-b_half + std::sqrt(discr)) / a;
 
-            if (t < t_min || t > t_max) {
+            if (!ts.surronds(t)) {
                 // larger t also out of range: return false
 
                 return std::nullopt;
@@ -64,10 +65,11 @@ class Sphere : public RenderObject {
 
         hit_record.t = t;
         hit_record.p = ray.At(t);
-        hit_record.normal = (hit_record.p - centre_) / radius_;
 
-        if (!hit_record.front_face) {
-            hit_record.normal = -hit_record.normal;
+        if (hit_record.front_face) {
+            hit_record.normal = (hit_record.p - centre_) / radius_;
+        } else {
+            hit_record.normal = -(hit_record.p - centre_) / radius_;
         }
 
         return hit_record;

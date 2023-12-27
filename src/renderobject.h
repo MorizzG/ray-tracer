@@ -3,6 +3,7 @@
 #include <memory>
 #include <optional>
 
+#include "interval.h"
 #include "ray.h"
 #include "vec3.h"
 
@@ -25,7 +26,7 @@ class RenderObject {
 
     virtual ~RenderObject() = default;
 
-    virtual std::optional<HitRecord> hit(const Ray& ray, double t_min, double t_max) const = 0;
+    virtual std::optional<HitRecord> hit(const Ray& ray, Interval ts) const = 0;
 };
 
 using SharedRenderObject = std::shared_ptr<RenderObject>;

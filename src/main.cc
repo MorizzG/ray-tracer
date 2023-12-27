@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "colour.h"
 #include "image.h"
+#include "interval.h"
 #include "ray.h"
 #include "raytracer.h"
 #include "renderobject.h"
@@ -12,7 +13,8 @@
 #include "vec3.h"
 
 Colour RayColour(const Ray& ray, const RenderObject& world) {
-    auto hit_record = world.hit(ray, 0.0, kInf);
+    auto hit_record = world.hit(ray, Interval::kPositive);
+    // auto hit_record = world.hit(ray, Interval{0.505, kInf});
 
     if (hit_record.has_value()) {
         // assert(hit_record.front_face);
@@ -21,7 +23,7 @@ Colour RayColour(const Ray& ray, const RenderObject& world) {
 
         if (!hit_record->front_face) {
             // return Colour{0.0, 0.0, 0.0};
-            return Colour{0.5 * (n + Vec3{1, 1, 1})};
+            return Colour::kBlack;
         }
 
         return Colour{0.5 * (n + Vec3{1, 1, 1})};

@@ -4,8 +4,8 @@
 #include <optional>
 #include <vector>
 
+#include "interval.h"
 #include "ray.h"
-#include "raytracer.h"
 #include "renderobject.h"
 
 class RenderObjectList : public RenderObject {
@@ -24,15 +24,16 @@ class RenderObjectList : public RenderObject {
 
     void Clear() { objs_.clear(); }
 
-    std::optional<HitRecord> hit(const Ray& ray, double t_min, double t_max) const override {
+    std::optional<HitRecord> hit(const Ray& ray, Interval ts) const override {
         std::optional<HitRecord> closest_hit_record = std::nullopt;
 
-        double closest_t = kInf;
+        double closest_t = ts.max();
 
         for (const auto& obj : objs_) {
-            auto hit_record = obj->hit(ray, t_min, t_max);
+            Interval _ts{ts.min(), closest_t};
+            auto hit_record = obj->hit(ray, _ts);
 
-            if (hit_record.has_value() && hit_record->t < closest_t) {
+            if (hit_record.has_value()) {
                 closest_hit_record = hit_record;
                 closest_t = hit_record->t;
             }
