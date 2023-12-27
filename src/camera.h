@@ -1,7 +1,11 @@
 #pragma once
 
+#include <iostream>
+
+#include "image.h"
 #include "ray.h"
 #include "raytracer.h"
+#include "renderobject.h"
 #include "vec3.h"
 
 class Camera {
@@ -27,6 +31,19 @@ class Camera {
 
     constexpr Vec3 centre() const { return centre_; }
 
+    constexpr void Render(Image& img, const RenderObject& world) const {
+        for (u32 j = 0; j < img.height(); j++) {
+            std::clog << "\rWriting line " << j << " of " << img.height() << std::flush;
+
+            for (u32 i = 0; i < img.width(); i++) {
+                auto ray = CastRay(i, j);
+
+                img[i, j] = Cast(ray, world);
+            }
+        }
+    }
+
+   private:
     constexpr Vec3 Image2World(u32 i, u32 j) const {
         return pixel_00_ + i * d_u_pixel_ + j * d_v_pixel_;
     }
@@ -39,7 +56,6 @@ class Camera {
         return Ray{centre(), ray_direction};
     }
 
-   private:
     Vec3 centre_;
 
     // position of pixel 0, 0
