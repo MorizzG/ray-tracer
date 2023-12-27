@@ -3,9 +3,13 @@
 #include <cassert>
 #include <iomanip>
 #include <ios>
+#include <iostream>
 #include <ostream>
+#include <sstream>
+#include <string>
 
-#include "util.h"
+#include "raytracer.h"
+#include "vec3.h"
 
 class Colour {
    public:
@@ -19,6 +23,8 @@ class Colour {
         assert(0.0 <= b && b <= 1.0);
     }
 
+    constexpr explicit Colour(Vec3 v) : Colour{v.x(), v.y(), v.z()} {}
+
     constexpr double& r() { return r_; }
     constexpr double& g() { return g_; }
     constexpr double& b() { return b_; }
@@ -26,6 +32,18 @@ class Colour {
     constexpr double r() const { return r_; }
     constexpr double g() const { return g_; }
     constexpr double b() const { return b_; }
+
+    std::string to_string() const {
+        std::stringstream ss;
+
+        ss << '#';
+
+        ss << std::hex << std::setfill('0') << std::setw(2) << FToU8(r());
+        ss << std::hex << std::setfill('0') << std::setw(2) << FToU8(g());
+        ss << std::hex << std::setfill('0') << std::setw(2) << FToU8(b());
+
+        return ss.str();
+    }
 
    private:
     double r_;
@@ -35,20 +53,14 @@ class Colour {
 
 constexpr Colour Colour::kBlack{0.0, 0.0, 0.0};
 
-constexpr Colour operator*(double t, Colour col) {
-    return {t * col.r(), t * col.g(), t * col.b()};
-}
+constexpr Colour operator*(double t, Colour col) { return {t * col.r(), t * col.g(), t * col.b()}; }
 
 constexpr Colour operator+(Colour c1, Colour c2) {
     return {c1.r() + c2.r(), c1.g() + c2.g(), c1.b() + c2.b()};
 }
 
-inline std::ostream& operator<<(std::ostream& out, Colour colour) {
-    out << '#';
+inline std::ostream& operator<<(std::ostream& os, Colour colour) {
+    os << FToU8(colour.r()) << ' ' << FToU8(colour.g()) << ' ' << FToU8(colour.b());
 
-    out << std::hex << std::setfill('0') << std::setw(2) << FToU8(colour.r());
-    out << std::hex << std::setfill('0') << std::setw(2) << FToU8(colour.g());
-    out << std::hex << std::setfill('0') << std::setw(2) << FToU8(colour.b());
-
-    return out;
+    return os;
 }

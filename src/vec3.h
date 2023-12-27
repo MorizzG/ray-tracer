@@ -3,6 +3,7 @@
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <ostream>
 
 class Vec3 {
@@ -86,9 +87,7 @@ constexpr Vec3 operator+(const Vec3& u, const Vec3& v) {
     return out;
 }
 
-constexpr Vec3 operator-(const Vec3& u, const Vec3& v) {
-    return u + (-v);
-}
+constexpr Vec3 operator-(const Vec3& u, const Vec3& v) { return u + (-v); }
 
 constexpr Vec3 operator*(const Vec3& u, const Vec3& v) {
     return {u.x() * v.x(), u.y() * v.y(), u.z() * v.z()};
@@ -100,9 +99,7 @@ constexpr Vec3 operator*(double t, const Vec3& v) {
     return out;
 }
 
-constexpr Vec3 operator/(const Vec3& v, double t) {
-    return (1 / t) * v;
-}
+constexpr Vec3 operator/(const Vec3& v, double t) { return (1 / t) * v; }
 
 constexpr double dot(const Vec3& u, const Vec3& v) {
     Vec3 tmp = u * v;
@@ -114,6 +111,4 @@ constexpr Vec3 cross(const Vec3& u, const Vec3& v) {
             u.x() * v.y() - u.y() - v.x()};
 }
 
-constexpr Vec3 normed(const Vec3& v) {
-    return v.normed();
-}
+constexpr Vec3 normed(const Vec3& v) { return v.normed(); }

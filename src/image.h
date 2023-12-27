@@ -2,26 +2,25 @@
 
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <ostream>
 
 #include "colour.h"
-#include "util.h"
+#include "raytracer.h"
 
 class Image {
    public:
-    constexpr Image(uint32_t width, uint32_t height)
+    constexpr Image(u32 width, u32 height)
         // NOLINTNEXTLINE(modernize-avoid-c-arrays,cppcoreguidelines-avoid-c-arrays)
         : buf_(std::make_unique_for_overwrite<Colour[]>(static_cast<std::size_t>(width) * height)),
           width_{width},
           height_{height} {}
 
-    constexpr uint32_t width() const { return width_; }
-    constexpr uint32_t height() const { return height_; }
+    constexpr u32 width() const { return width_; }
+    constexpr u32 height() const { return height_; }
 
-    Colour& operator[](uint32_t x, uint32_t y) {
+    Colour& operator[](u32 x, u32 y) {
         assert(x < width_);
         assert(y < height_);
 
@@ -30,7 +29,7 @@ class Image {
         return buf_[y * width_ + x];
     }
 
-    Colour operator[](uint32_t x, uint32_t y) const {
+    Colour operator[](u32 x, u32 y) const {
         assert(x < width_);
         assert(y < height_);
 
@@ -43,24 +42,26 @@ class Image {
     // NOLINTNEXTLINE(modernize-avoid-c-arrays,cppcoreguidelines-avoid-c-arrays)
     std::unique_ptr<Colour[]> buf_;
 
-    uint32_t width_;
-    uint32_t height_;
+    u32 width_;
+    u32 height_;
 };
 
 constexpr std::ostream& operator<<(std::ostream& os, const Image& img) {
-    os << "P3\n" << img.width() << ' ' << img.height() << "\n255\n";
+    os << "P3" << newline;
+    os << img.width() << ' ' << img.height() << newline;
+    os << "255" << newline;
 
-    for (uint32_t j = 0; j < img.height(); j++) {
+    for (u32 j = 0; j < img.height(); j++) {
         std::clog << "\rWriting line " << j << " of " << img.height() << std::flush;
 
-        for (uint32_t i = 0; i < img.width(); i++) {
+        for (u32 i = 0; i < img.width(); i++) {
             const Colour col = img[i, j];
 
-            os << FToU8(col.r()) << ' ' << FToU8(col.g()) << ' ' << FToU8(col.b()) << '\n';
+            os << col << newline;
         }
     }
 
-    std::clog << "\rDone                                                " << std::endl;
+    std::clog << "\rDone                                                " << newline;
 
     return os;
 }
