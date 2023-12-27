@@ -1,22 +1,26 @@
 #pragma once
 
+#include <algorithm>
+
 #include "raytracer.h"
 class Interval {
    public:
     static const Interval kEmpty, kFull, kPositive;
 
     constexpr Interval() = default;
-    constexpr Interval(double min, double max) : min_{min}, max_{max} {}
+    constexpr Interval(f64 min, f64 max) : min_{min}, max_{max} {}
 
-    constexpr double min() const { return min_; }
-    constexpr double max() const { return max_; }
+    constexpr f64 min() const { return min_; }
+    constexpr f64 max() const { return max_; }
 
-    constexpr bool contains(double x) const { return min_ <= x && x <= max_; }
-    constexpr bool surronds(double x) const { return min_ < x && x < max_; }
+    constexpr bool contains(f64 x) const { return min_ <= x && x <= max_; }
+    constexpr bool surronds(f64 x) const { return min_ < x && x < max_; }
+
+    constexpr double clamp(f64 x) const { return std::clamp(x, min_, max_); }
 
    private:
-    double min_ = kInf;
-    double max_ = -kInf;
+    f64 min_ = kInf;
+    f64 max_ = -kInf;
 };
 
 constexpr Interval Interval::kEmpty{kInf, -kInf};

@@ -6,29 +6,30 @@
 
 #include "interval.h"
 #include "ray.h"
+#include "raytracer.h"
 #include "renderobject.h"
 #include "vec3.h"
 
 class Sphere : public RenderObject {
    public:
     constexpr Sphere() = default;
-    constexpr Sphere(Point3 centre, double radius) : centre_{centre}, radius_{radius} {
+    constexpr Sphere(Point3 centre, f64 radius) : centre_{centre}, radius_{radius} {
         assert(radius >= 0);
     }
 
     constexpr Point3 centre() const { return centre_; }
-    constexpr double radius() const { return radius_; }
+    constexpr f64 radius() const { return radius_; }
 
     std::optional<HitRecord> hit(const Ray& ray, Interval ts) const override {
         HitRecord hit_record;
 
         Vec3 oc = ray.origin() - centre_;
 
-        double a = ray.direction().squared();
-        double b_half = dot(oc, ray.direction());
-        double c = oc.squared() - radius_ * radius_;
+        f64 a = ray.direction().squared();
+        f64 b_half = dot(oc, ray.direction());
+        f64 c = oc.squared() - radius_ * radius_;
 
-        auto discr = b_half * b_half - a * c;
+        f64 discr = b_half * b_half - a * c;
 
         if (discr < 0) {
             // miss
@@ -38,7 +39,7 @@ class Sphere : public RenderObject {
         // hit
 
         // smaller of the ts that hit the sphere
-        double t = (-b_half - std::sqrt(discr)) / a;
+        f64 t = (-b_half - std::sqrt(discr)) / a;
 
         if (t >= ts.max()) {
             // if the smaller t is already too large, we don't need to check the second one since it
@@ -77,5 +78,5 @@ class Sphere : public RenderObject {
 
    private:
     Point3 centre_{};
-    double radius_ = 0.0;
+    f64 radius_ = 0.0;
 };

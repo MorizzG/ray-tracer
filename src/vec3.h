@@ -6,31 +6,33 @@
 #include <cstddef>
 #include <ostream>
 
+#include "raytracer.h"
+
 class Vec3 {
    public:
     static const Vec3 e_x;
     static const Vec3 e_y;
     static const Vec3 e_z;
 
-    constexpr Vec3(double x, double y, double z) : xyz_{x, y, z} {}
+    constexpr Vec3(f64 x, f64 y, f64 z) : xyz_{x, y, z} {}
     constexpr Vec3() : Vec3{0, 0, 0} {}
 
-    constexpr double& x() { return xyz_[0]; }
-    constexpr double& y() { return xyz_[1]; }
-    constexpr double& z() { return xyz_[2]; }
+    constexpr f64& x() { return xyz_[0]; }
+    constexpr f64& y() { return xyz_[1]; }
+    constexpr f64& z() { return xyz_[2]; }
 
-    constexpr double x() const { return xyz_[0]; }
-    constexpr double y() const { return xyz_[1]; }
-    constexpr double z() const { return xyz_[2]; }
+    constexpr f64 x() const { return xyz_[0]; }
+    constexpr f64 y() const { return xyz_[1]; }
+    constexpr f64 z() const { return xyz_[2]; }
 
     constexpr Vec3 operator-() const { return Vec3{-x(), -y(), -z()}; }
 
-    constexpr double& operator[](std::size_t i) {
+    constexpr f64& operator[](std::size_t i) {
         assert(i <= 3);
         return xyz_[i];
     }
 
-    constexpr double operator[](std::size_t i) const {
+    constexpr f64 operator[](std::size_t i) const {
         assert(i <= 3);
         return xyz_[i];
     }
@@ -43,7 +45,7 @@ class Vec3 {
         return *this;
     }
 
-    constexpr Vec3& operator*=(double t) {
+    constexpr Vec3& operator*=(f64 t) {
         x() *= t;
         y() *= t;
         z() *= t;
@@ -51,15 +53,15 @@ class Vec3 {
         return *this;
     }
 
-    constexpr Vec3& operator/=(double t) {
+    constexpr Vec3& operator/=(f64 t) {
         *this *= 1 / t;
 
         return *this;
     }
 
-    constexpr double squared() const { return x() * x() + y() * y() + z() * z(); }
+    constexpr f64 squared() const { return x() * x() + y() * y() + z() * z(); }
 
-    constexpr double norm() const { return std::sqrt(squared()); }
+    constexpr f64 norm() const { return std::sqrt(squared()); }
 
     constexpr Vec3 normed() const {
         auto r = *this;
@@ -68,7 +70,7 @@ class Vec3 {
     }
 
    private:
-    std::array<double, 3> xyz_;
+    std::array<f64, 3> xyz_;
 };
 
 constexpr Vec3 Vec3::e_x{1.0, 0.0, 0.0};
@@ -93,15 +95,15 @@ constexpr Vec3 operator*(const Vec3& u, const Vec3& v) {
     return {u.x() * v.x(), u.y() * v.y(), u.z() * v.z()};
 }
 
-constexpr Vec3 operator*(double t, const Vec3& v) {
+constexpr Vec3 operator*(f64 t, const Vec3& v) {
     Vec3 out = v;
     out *= t;
     return out;
 }
 
-constexpr Vec3 operator/(const Vec3& v, double t) { return (1 / t) * v; }
+constexpr Vec3 operator/(const Vec3& v, f64 t) { return (1 / t) * v; }
 
-constexpr double dot(const Vec3& u, const Vec3& v) {
+constexpr f64 dot(const Vec3& u, const Vec3& v) {
     Vec3 tmp = u * v;
     return tmp.x() + tmp.y() + tmp.z();
 }

@@ -57,6 +57,8 @@ constexpr std::ostream& operator<<(std::ostream& os, const Image& img) {
         for (u32 i = 0; i < img.width(); i++) {
             const Colour col = img[i, j];
 
+            col.CheckValid();
+
             os << col << newline;
         }
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "raytracer.h"
 #include "vec3.h"
 
 class Ray {
@@ -11,7 +12,7 @@ class Ray {
     Point3 origin() const { return orig_; }
     Vec3 direction() const { return dir_; }
 
-    constexpr Point3 At(double t) const { return orig_ + t * dir_; }
+    constexpr Point3 At(f64 t) const { return orig_ + t * dir_; }
 
    private:
     Point3 orig_;

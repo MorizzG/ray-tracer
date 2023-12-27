@@ -27,7 +27,7 @@ class RenderObjectList : public RenderObject {
     std::optional<HitRecord> hit(const Ray& ray, Interval ts) const override {
         std::optional<HitRecord> closest_hit_record = std::nullopt;
 
-        double closest_t = ts.max();
+        f64 closest_t = ts.max();
 
         for (const auto& obj : objs_) {
             Interval _ts{ts.min(), closest_t};
