@@ -1,47 +1,47 @@
 #pragma once
 
-#include <cassert>
+#include <philox.h>
 
 #include "raytracer.h"
-class Random {
+#include "vec3.h"
+
+class RandomGen {
    public:
-    constexpr explicit Random(u64 j) {
-        assert(j != v_);
+    constexpr u64 GenU64() { return philox_.Next(); }
+    // constexpr u32 GenU32() { return static_cast<u32>(GenU64()); }
 
-        u_ = j ^ v_;
-        GenU64();
+    constexpr f64 GenUniform() { return philox_.NextF64(); }
 
-        v_ = u_;
-        GenU64();
+    constexpr f64 GenUniform(f64 min, f64 max) { return min + (max - min) * GenUniform(); }
 
-        w_ = v_;
-        GenU64();
+    constexpr Vec3 GenVec3() { return Vec3{GenUniform(), GenUniform(), GenUniform()}; }
+
+    constexpr Vec3 GenVec3(f64 min, f64 max) {
+        return Vec3{GenUniform(min, max), GenUniform(min, max), GenUniform(min, max)};
     }
 
-    constexpr u64 GenU64() {
-        u_ = u_ * 2862933555777941757ULL + 7046029254386353087ULL;
+    constexpr Vec3 GenInUnitBall() {
+        while (true) {
+            Vec3 v = GenVec3(-1.0, 1.0);
 
-        v_ ^= v_ >> 17;
-        v_ ^= v_ << 31;
-        v_ ^= v_ >> 8;
-
-        w_ = 4294957665ULL * (w_ & 0xffffffffULL) + (w_ >> 32);
-
-        u64 x = u_ ^ (u_ << 21);
-        x ^= x >> 35;
-        x ^= x << 4;
-
-        return (x + v_) ^ w_;
+            if (v.norm() < 1.0) {
+                return v;
+            }
+        }
     }
 
-    constexpr u32 GenU32() { return static_cast<u32>(GenU64()); }
+    constexpr Vec3 GenOnUnitSphere() { return GenInUnitBall().normed(); }
 
-    constexpr f64 GenF64() { return 5.42101086242752217E-20 * static_cast<f64>(GenU64()); }
+    constexpr Vec3 GenOnHemisphere(const Vec3& normal) {
+        Vec3 v = GenOnUnitSphere();
 
-    constexpr f64 GenF64(f64 min, f64 max) { return min + (max - min) * GenF64(); }
+        if (dot(v, normal) < 0) {
+            v = -v;
+        }
+
+        return v;
+    }
 
    private:
-    u64 u_ = 0ULL;
-    u64 v_ = 4101842887655102017ULL;
-    u64 w_ = 1ULL;
+    Philox philox_;
 };

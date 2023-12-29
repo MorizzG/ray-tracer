@@ -15,7 +15,7 @@
 class Renderer {
    public:
     constexpr explicit Renderer(Camera camera, u32 samples_per_pixel = 10)
-        : camera_{camera}, rand_{0}, samples_per_pixel_{samples_per_pixel} {}
+        : camera_{camera}, samples_per_pixel_{samples_per_pixel} {}
 
     constexpr Image Render(const RenderObject& world) {
         Image img{camera_.image_width(), camera_.image_height()};
@@ -43,8 +43,8 @@ class Renderer {
     constexpr Ray SampleRay(u32 i, u32 j) {
         auto pixel_centre = camera_.PixelToWorld(i, j);
 
-        Vec3 random_shift = rand_.GenF64(-0.5, 0.5) * camera_.d_u_pixel() +
-                            rand_.GenF64(-0.5, 0.5) * camera_.d_v_pixel();
+        Vec3 random_shift = rand_.GenUniform(-0.5, 0.5) * camera_.d_u_pixel() +
+                            rand_.GenUniform(-0.5, 0.5) * camera_.d_v_pixel();
 
         pixel_centre += random_shift;
 
@@ -53,17 +53,22 @@ class Renderer {
         return Ray{camera_.centre(), ray_direction};
     }
 
-    static constexpr Colour Cast(const Ray& ray, const RenderObject& world) {
+    constexpr Colour Cast(const Ray& ray, const RenderObject& world) {
         auto hit_record = world.hit(ray, Interval::kPositive);
 
         if (hit_record.has_value()) {
-            Vec3 n = hit_record->normal;
+            Vec3 normal = hit_record->normal;
 
             if (!hit_record->front_face) {
                 return Colour::kBlack;
             }
 
-            return Colour{0.5 * (n + Vec3{1, 1, 1})};
+            Vec3 new_origin = hit_record->p;
+            Vec3 new_direction = rand_.GenOnHemisphere(normal);
+
+            Ray new_ray{new_origin, new_direction};
+
+            return 0.5 * Cast(new_ray, world);
         }
 
         auto unit_dir = ray.direction().normed();
@@ -75,7 +80,7 @@ class Renderer {
 
     Camera camera_;
 
-    Random rand_;
+    RandomGen rand_{};
 
     u32 samples_per_pixel_;
 };

@@ -1,0 +1,3 @@
+[submodule "subprojects/philox"]
+	path = subprojects/philox
+	url = git@github.com:MorizzG/philox
