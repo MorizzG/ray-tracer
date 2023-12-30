@@ -44,6 +44,14 @@ class Colour {
         return *this;
     }
 
+    constexpr Colour& operator*=(const Colour& c) {
+        r_ *= c.r();
+        g_ *= c.g();
+        b_ *= c.b();
+
+        return *this;
+    }
+
     constexpr Colour to_gamma2() const {
         return Colour{std::sqrt(r()), std::sqrt(g()), std::sqrt(b())};
     }
@@ -75,6 +83,14 @@ constexpr Colour operator+(Colour c1, Colour c2) {
     Colour out{c1};
 
     out += c2;
+
+    return out;
+}
+
+constexpr Colour operator*(Colour c1, Colour c2) {
+    Colour out{c1};
+
+    out *= c2;
 
     return out;
 }

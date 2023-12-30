@@ -1,6 +1,6 @@
 #pragma once
 
-#include <philox.h>
+#include <philox.hh>
 
 #include "raytracer.h"
 #include "vec3.h"

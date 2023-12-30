@@ -65,15 +65,13 @@ class Vec3 {
         return std::fabs(x()) < eps && std::fabs(y()) < eps && std::fabs(z()) < eps;
     }
 
-    constexpr f64 squared() const { return x() * x() + y() * y() + z() * z(); }
+    constexpr f64 squared() const;
 
-    constexpr f64 norm() const { return std::sqrt(squared()); }
+    constexpr f64 norm() const;
 
-    constexpr Vec3 normed() const {
-        auto r = *this;
-        r /= norm();
-        return r;
-    }
+    constexpr Vec3 normed() const;
+
+    constexpr Vec3 reflect(Vec3 normal) const;
 
    private:
     std::array<f64, 3> xyz_;
@@ -119,4 +117,10 @@ constexpr Vec3 cross(const Vec3& u, const Vec3& v) {
             u.x() * v.y() - u.y() - v.x()};
 }
 
-constexpr Vec3 normed(const Vec3& v) { return v.normed(); }
+constexpr f64 Vec3::squared() const { return dot(*this, *this); }
+
+constexpr f64 Vec3::norm() const { return std::sqrt(squared()); }
+
+constexpr Vec3 Vec3::normed() const { return *this / norm(); }
+
+constexpr Vec3 Vec3::reflect(Vec3 normal) const { return *this - 2 * dot(*this, normal) * normal; }

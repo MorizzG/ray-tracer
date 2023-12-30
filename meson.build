@@ -27,7 +27,6 @@ if get_option('native')
 endif
 
 
-
 rand_proj = subproject('rand', default_options : ['warning_level=0', 'werror=false'])
 rand_dep = rand_proj.get_variable('rand_dep')
 

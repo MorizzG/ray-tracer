@@ -76,7 +76,7 @@ class Renderer {
 
         pixel_centre += random_shift;
 
-        auto ray_direction = pixel_centre - camera_.centre();
+        auto ray_direction = (pixel_centre - camera_.centre()).normed();
 
         return Ray{camera_.centre(), ray_direction};
     }
@@ -84,33 +84,32 @@ class Renderer {
     constexpr Colour Cast(const Ray& ray, const RenderObject& world, u32 bounces) {
         auto hit_record = world.hit(ray, Interval{0.001, kInf});
 
-        if (hit_record.has_value()) {
-            if (!hit_record->front_face || bounces == 0) {
-                return Colour::kBlack;
-            }
+        // background
+        if (!hit_record.has_value()) {
+            auto unit_dir = ray.direction().normed();
 
-            /* Vec3 normal = hit_record->normal;
+            f64 a = 0.5 * (unit_dir.y() + 1.0);
 
-            Vec3 new_origin = hit_record->p;
-
-            // Vec3 new_direction = rand_.GenOnHemisphere(normal);
-            Vec3 new_direction = normal + rand_.GenOnUnitSphere();
-
-            Ray new_ray{new_origin, new_direction}; */
-
-            auto res = hit_record->mat->Scatter(ray, hit_record.value());
-
-            auto [albedo, out_ray] = res.value();
-
-            assert(bounces > 0);
-            return 0.5 * Cast(out_ray, world, bounces - 1);
+            return (1.0 - a) * Colour{1.0, 1.0, 1.0} + a * Colour{0.5, 0.7, 1.0};
         }
 
-        auto unit_dir = ray.direction().normed();
+        // hit
 
-        f64 a = 0.5 * (unit_dir.y() + 1.0);
+        if (!hit_record->front_face || bounces == 0) {
+            return Colour::kBlack;
+        }
 
-        return (1.0 - a) * Colour{1.0, 1.0, 1.0} + a * Colour{0.5, 0.7, 1.0};
+        auto res = hit_record->mat->Scatter(ray, hit_record.value());
+
+        if (!res.has_value()) {
+            // absorped
+            return Colour::kBlack;
+        }
+
+        auto [albedo, out_ray] = res.value();
+
+        assert(bounces > 0);
+        return albedo * Cast(out_ray, world, bounces - 1);
     }
 
     Camera camera_;
