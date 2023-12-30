@@ -1,6 +1,3 @@
-[submodule "subprojects/philox"]
-	path = subprojects/philox
-	url = git@github.com:MorizzG/philox
 [submodule "subprojects/rand"]
 	path = subprojects/rand
 	url = git@github.com:MorizzG/rand

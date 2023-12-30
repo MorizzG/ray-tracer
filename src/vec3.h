@@ -59,6 +59,12 @@ class Vec3 {
         return *this;
     }
 
+    constexpr bool almost_zero() const {
+        f64 eps = 1e-8;
+
+        return std::fabs(x()) < eps && std::fabs(y()) < eps && std::fabs(z()) < eps;
+    }
+
     constexpr f64 squared() const { return x() * x() + y() * y() + z() * z(); }
 
     constexpr f64 norm() const { return std::sqrt(squared()); }

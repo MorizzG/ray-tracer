@@ -2,9 +2,11 @@
 
 #include <cassert>
 #include <cmath>
+#include <memory>
 #include <optional>
 
 #include "interval.h"
+#include "material.h"
 #include "ray.h"
 #include "raytracer.h"
 #include "renderobject.h"
@@ -13,7 +15,9 @@
 class Sphere : public RenderObject {
    public:
     constexpr Sphere() = default;
-    constexpr Sphere(Point3 centre, f64 radius) : centre_{centre}, radius_{radius} {
+
+    Sphere(Point3 centre, f64 radius, const std::shared_ptr<Material>& mat)
+        : centre_{centre}, radius_{radius}, mat_{mat} {
         assert(radius >= 0);
     }
 
@@ -21,7 +25,7 @@ class Sphere : public RenderObject {
     constexpr f64 radius() const { return radius_; }
 
     std::optional<HitRecord> hit(const Ray& ray, Interval ts) const override {
-        HitRecord hit_record;
+        HitRecord hit_record{};
 
         Vec3 oc = ray.origin() - centre_;
 
@@ -66,6 +70,7 @@ class Sphere : public RenderObject {
 
         hit_record.t = t;
         hit_record.p = ray.At(t);
+        hit_record.mat = mat_.get();
 
         if (hit_record.front_face) {
             hit_record.normal = (hit_record.p - centre_) / radius_;
@@ -79,4 +84,6 @@ class Sphere : public RenderObject {
    private:
     Point3 centre_{};
     f64 radius_ = 0.0;
+
+    std::shared_ptr<Material> mat_;
 };

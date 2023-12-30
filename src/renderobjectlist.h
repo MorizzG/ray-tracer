@@ -1,18 +1,21 @@
 #pragma once
 
 #include <initializer_list>
+#include <memory>
 #include <optional>
+#include <utility>
 #include <vector>
 
 #include "interval.h"
 #include "ray.h"
+#include "raytracer.h"
 #include "renderobject.h"
 
 class RenderObjectList : public RenderObject {
    public:
     constexpr RenderObjectList() = default;
     // explicit RenderObjectList(const SharedRenderObject& obj) { Append(obj); }
-    RenderObjectList(std::initializer_list<SharedRenderObject> objs) : objs_{objs} {}
+    // RenderObjectList(std::initializer_list<RenderObject> objs) : objs_{objs} {}
 
     constexpr auto begin() { return objs_.begin(); }
     constexpr auto end() { return objs_.end(); }
@@ -20,7 +23,7 @@ class RenderObjectList : public RenderObject {
     constexpr auto begin() const { return objs_.begin(); }
     constexpr auto end() const { return objs_.end(); }
 
-    void Add(const SharedRenderObject& obj) { objs_.push_back(obj); }
+    void Add(std::unique_ptr<RenderObject> obj) { objs_.emplace_back(std::move(obj)); }
 
     void Clear() { objs_.clear(); }
 
@@ -43,5 +46,5 @@ class RenderObjectList : public RenderObject {
     }
 
    private:
-    std::vector<SharedRenderObject> objs_;
+    std::vector<std::unique_ptr<RenderObject>> objs_;
 };

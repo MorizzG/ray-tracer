@@ -52,18 +52,15 @@ constexpr std::ostream& operator<<(std::ostream& os, const Image& img) {
     os << "255" << newline;
 
     for (u32 j = 0; j < img.height(); j++) {
-        std::clog << "\rWriting line " << j << " of " << img.height() << std::flush;
-
         for (u32 i = 0; i < img.width(); i++) {
             const Colour col = img[i, j];
 
             col.CheckValid();
 
-            os << col << newline;
+            // apply gamma 2 transform
+            os << col.to_gamma2() << newline;
         }
     }
-
-    std::clog << "\rDone                                                " << newline;
 
     return os;
 }

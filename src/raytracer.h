@@ -10,6 +10,8 @@ using u64 = uint64_t;
 using f64 = double;
 
 constexpr f64 kInf = std::numeric_limits<f64>::infinity();
+constexpr f64 kNan = std::numeric_limits<f64>::signaling_NaN();
+
 constexpr f64 kPi = std::numbers::pi_v<f64>;
 
 constexpr char newline = '\n';

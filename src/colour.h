@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <cmath>
 #include <iomanip>
 #include <ios>
 #include <iostream>
@@ -43,6 +44,10 @@ class Colour {
         return *this;
     }
 
+    constexpr Colour to_gamma2() const {
+        return Colour{std::sqrt(r()), std::sqrt(g()), std::sqrt(b())};
+    }
+
     std::string to_string() const {
         std::stringstream ss;
 
@@ -74,8 +79,12 @@ constexpr Colour operator+(Colour c1, Colour c2) {
     return out;
 }
 
-inline std::ostream& operator<<(std::ostream& os, Colour colour) {
-    os << FToU8(colour.r()) << ' ' << FToU8(colour.g()) << ' ' << FToU8(colour.b());
+inline std::ostream& operator<<(std::ostream& os, Colour c) {
+    double r = c.r();
+    double g = c.g();
+    double b = c.b();
+
+    os << FToU8(r) << ' ' << FToU8(g) << ' ' << FToU8(b);
 
     return os;
 }

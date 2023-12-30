@@ -2,10 +2,11 @@
 #include <memory>
 
 #include "camera.h"
+#include "colour.h"
 #include "image.h"
+#include "material.h"
 #include "raytracer.h"
 #include "renderer.h"
-#include "renderobject.h"
 #include "renderobjectlist.h"
 #include "sphere.h"
 #include "vec3.h"
@@ -15,14 +16,16 @@ int main(int /* argc */, char* /* argv */[]) {
 
     RenderObjectList world;
 
-    world.Add(std::make_shared<Sphere>(Vec3{0, -100.5, -1}, 100));
-    world.Add(std::make_shared<Sphere>(-Vec3::e_z, 0.5));
+    auto lamb = std::make_shared<Lambertian>(Colour{0.1, 0.4, 0.8});
+
+    world.Add(std::make_unique<Sphere>(Vec3{0, -100.5, -1}, 100, lamb));
+    world.Add(std::make_unique<Sphere>(-Vec3::e_z, 0.5, lamb));
 
     // camera
 
     constexpr f64 aspect_ratio = 16.0 / 9.0;
 
-    constexpr u32 image_width = 800;
+    constexpr u32 image_width = 600;
     constexpr auto image_height = static_cast<u32>(image_width / aspect_ratio);
 
     // constexpr u32 image_width = 1920;

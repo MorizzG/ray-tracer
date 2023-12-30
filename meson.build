@@ -12,9 +12,24 @@ add_project_arguments(
     language : 'cpp'
 )
 
+if get_option('native')
+    add_global_arguments(
+        '-march=native',
 
-philox_proj = subproject('philox', default_options : ['warning_level=0', 'werror=false'])
-philox_dep = philox_proj.get_variable('philox_dep')
+        language : 'c'
+    )
+
+    add_global_arguments(
+        '-march=native',
+
+        language : 'cpp'
+    )
+endif
+
+
+
+rand_proj = subproject('rand', default_options : ['warning_level=0', 'werror=false'])
+rand_dep = rand_proj.get_variable('rand_dep')
 
 
 sources = []
@@ -22,4 +37,4 @@ subdir('src')
 
 inc = include_directories('src')
 
-executable('ray-tracer', sources, include_directories : inc, dependencies : [philox_dep])
+executable('ray-tracer', sources, include_directories : inc, dependencies : [rand_dep])

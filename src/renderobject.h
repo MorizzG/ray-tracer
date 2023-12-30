@@ -5,12 +5,17 @@
 
 #include "interval.h"
 #include "ray.h"
+#include "raytracer.h"
 #include "vec3.h"
+
+class Material;
 
 struct HitRecord {
     Point3 p;
     Vec3 normal;
-    f64 t = 0.0;
+    const Material* mat = nullptr;
+
+    f64 t = kNan;
     bool front_face = true;
 };
 
