@@ -7,6 +7,20 @@
 
 class RandomGen {
    public:
+    constexpr RandomGen(const RandomGen&) = delete;
+    constexpr RandomGen& operator=(const RandomGen&) = delete;
+
+    constexpr RandomGen(RandomGen&&) = delete;
+    constexpr RandomGen& operator=(RandomGen&&) = delete;
+
+    constexpr ~RandomGen() = default;
+
+    static RandomGen& GenInstance() {
+        static thread_local RandomGen rand{};
+
+        return rand;
+    }
+
     constexpr u64 GenU64() { return philox_.Next(); }
     // constexpr u32 GenU32() { return static_cast<u32>(GenU64()); }
 
@@ -43,5 +57,7 @@ class RandomGen {
     }
 
    private:
+    RandomGen() = default;
+
     Philox philox_;
 };

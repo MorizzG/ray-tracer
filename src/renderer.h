@@ -1,7 +1,11 @@
 #pragma once
 
+#include <sys/sysinfo.h>
+
 #include <array>
+#include <atomic>
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <thread>
 
@@ -30,12 +34,12 @@ class Renderer {
     Image Render(const RenderObject& world) {
         Image img{camera_.image_width(), camera_.image_height()};
 
-        constexpr u32 kNumThreads = 4;
+        constexpr u32 kNumThreads = 16;
 
-        auto render_thread = [this, &world, &img](u32 thread) {
+        std::atomic_uint32_t lines_done = 0;
+
+        auto render_thread = [this, &world, &img, &lines_done](u32 thread) {
             for (u32 j = thread; j < img.height(); j += kNumThreads) {
-                std::clog << "\rWriting line " << j << " of " << img.height() << std::flush;
-
                 for (u32 i = 0; i < img.width(); i++) {
                     Colour colour_sum{0.0, 0.0, 0.0};
 
@@ -47,6 +51,8 @@ class Renderer {
 
                     img[i, j] = colour_sum / samples_per_pixel_;
                 }
+
+                lines_done.fetch_add(1);
             }
         };
 
@@ -58,21 +64,39 @@ class Renderer {
             render_threads[i] = std::thread{render_thread, i};
         }
 
+        std::atomic_bool done = false;
+
+        auto writer_thread = std::thread([&done, &lines_done, total_lines = img.height()] {
+            using std::literals::chrono_literals::operator""ms;
+
+            while (!done.load()) {
+                std::cerr << "\rWriting line " << lines_done.load() << " of " << total_lines
+                          << std::flush;
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+
+            std::clog << "\rDone                                                " << newline;
+        });
+
         for (auto& t : render_threads) {
             t.join();
         }
 
-        std::clog << "\rDone                                                " << newline;
+        done.store(true);
+
+        writer_thread.join();
 
         return img;
     }
 
    private:
-    constexpr Ray SampleRay(u32 i, u32 j) {
+    Ray SampleRay(u32 i, u32 j) {
         auto pixel_centre = camera_.PixelToWorld(i, j);
 
-        Vec3 random_shift = rand_.GenUniform(-0.5, 0.5) * camera_.d_u_pixel() +
-                            rand_.GenUniform(-0.5, 0.5) * camera_.d_v_pixel();
+        auto& rand = RandomGen::GenInstance();
+
+        Vec3 random_shift = rand.GenUniform(-0.5, 0.5) * camera_.d_u_pixel() +
+                            rand.GenUniform(-0.5, 0.5) * camera_.d_v_pixel();
 
         pixel_centre += random_shift;
 
@@ -86,7 +110,7 @@ class Renderer {
 
         // background
         if (!hit_record.has_value()) {
-            auto unit_dir = ray.direction().normed();
+            auto unit_dir = ray.direction();
 
             f64 a = 0.5 * (unit_dir.y() + 1.0);
 
@@ -95,7 +119,7 @@ class Renderer {
 
         // hit
 
-        if (!hit_record->front_face || bounces == 0) {
+        if (bounces == 0) {
             return Colour::kBlack;
         }
 
@@ -113,8 +137,6 @@ class Renderer {
     }
 
     Camera camera_;
-
-    RandomGen rand_{};
 
     u32 samples_per_pixel_;
     u32 max_bounces_;

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <memory>
-#include <utility>
 
 #include "camera.h"
 #include "colour.h"
@@ -26,21 +25,26 @@ int main(int /* argc */, char* /* argv */[]) {
     world.Add(std::move(ground));
     world.Add(std::move(sphere)); */
 
-    auto material_ground = std::make_shared<Lambertian>(Colour(0.8, 0.8, 0.0));
-    auto material_center = std::make_shared<Lambertian>(Colour(0.7, 0.3, 0.3));
-    auto material_left = std::make_shared<Metal>(Colour(0.8, 0.8, 0.8), 0.05);
-    auto material_right = std::make_shared<Metal>(Colour(0.8, 0.5, 0.4), 0.5);
+    auto mat_ground = std::make_shared<Lambertian>(Colour(0.8, 0.8, 0.0));
+    auto mat_lamb = std::make_shared<Lambertian>(Colour(0.1, 0.2, 0.5));
+    auto mat_metal = std::make_shared<Metal>(Colour(0.8, 0.6, 0.2), 0.0);
+    auto mat_dielec = std::make_shared<Dielectric>(1.5, 0.0);
+    auto mat_dielec2 = std::make_shared<Dielectric>(0.66, 0.0);
 
-    world.Add(std::make_unique<Sphere>(Point3(0.0, -100.5, -1.0), 100.0, material_ground));
-    world.Add(std::make_unique<Sphere>(Point3(0.0, 0.0, -1.0), 0.5, material_center));
-    world.Add(std::make_unique<Sphere>(Point3(-1.0, 0.0, -1.0), 0.5, material_left));
-    world.Add(std::make_unique<Sphere>(Point3(1.0, 0.0, -1.0), 0.5, material_right));
+    world.Add(std::make_unique<Sphere>(Point3(0.0, -100.5, -1.0), 100.0, mat_ground));
+
+    world.Add(std::make_unique<Sphere>(Point3(0.0, 0.0, -1.0), 0.5, mat_lamb));
+
+    world.Add(std::make_unique<Sphere>(Point3(-1.0, 0.0, -1.0), 0.5, mat_dielec));
+    world.Add(std::make_unique<Sphere>(Point3(-1.0, 0.0, -1.0), 0.4, mat_dielec2));
+
+    world.Add(std::make_unique<Sphere>(Point3(1.0, 0.0, -1.0), 0.5, mat_metal));
 
     // camera
 
     constexpr f64 aspect_ratio = 16.0 / 9.0;
 
-    constexpr u32 image_width = 600;
+    constexpr u32 image_width = 800;
     constexpr auto image_height = static_cast<u32>(image_width / aspect_ratio);
 
     // constexpr u32 image_width = 1920;

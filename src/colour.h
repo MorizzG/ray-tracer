@@ -75,9 +75,14 @@ class Colour {
 };
 
 constexpr Colour Colour::kBlack{0.0, 0.0, 0.0};
+constexpr Colour Colour::kWhite{1.0, 1.0, 1.0};
 
-constexpr Colour operator*(f64 t, Colour col) { return {t * col.r(), t * col.g(), t * col.b()}; }
-constexpr Colour operator/(Colour col, f64 t) { return (1.0 / t) * col; }
+constexpr Colour operator*(f64 t, Colour col) {
+    return {t * col.r(), t * col.g(), t * col.b()};
+}
+constexpr Colour operator/(Colour col, f64 t) {
+    return (1.0 / t) * col;
+}
 
 constexpr Colour operator+(Colour c1, Colour c2) {
     Colour out{c1};
