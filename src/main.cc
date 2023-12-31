@@ -27,7 +27,7 @@ int main(int /* argc */, char* /* argv */[]) {
 
     auto mat_ground = std::make_shared<Lambertian>(Colour(0.8, 0.8, 0.0));
     auto mat_lamb = std::make_shared<Lambertian>(Colour(0.1, 0.2, 0.5));
-    auto mat_metal = std::make_shared<Metal>(Colour(0.8, 0.6, 0.2), 0.0);
+    auto mat_metal = std::make_shared<Metal>(Colour(0.9, 0.4, 0.6), 0.0);
     auto mat_dielec = std::make_shared<Dielectric>(1.5, 0.0);
     auto mat_dielec2 = std::make_shared<Dielectric>(0.66, 0.0);
 
@@ -57,6 +57,16 @@ int main(int /* argc */, char* /* argv */[]) {
     constexpr Point3 camera_centre{0.0, 0.0, 0.0};
 
     Camera camera{camera_centre, image_width, image_height, focal_length};
+
+    std::clog << camera.u() << newline;
+    std::clog << camera.v() << newline;
+    std::clog << camera.w() << newline << newline;
+
+    camera.look_at(Point3{0.8, 0.0, 1.0}, Vec3::e_x);
+
+    std::clog << camera.u() << newline;
+    std::clog << camera.v() << newline;
+    std::clog << camera.w() << newline << newline;
 
     // render
 

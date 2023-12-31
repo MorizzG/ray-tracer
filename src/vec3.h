@@ -119,7 +119,7 @@ constexpr f64 dot(const Vec3& u, const Vec3& v) {
 
 constexpr Vec3 cross(const Vec3& u, const Vec3& v) {
     return {u.y() * v.z() - u.z() - v.y(), u.z() * v.x() - u.x() * v.z(),
-            u.x() * v.y() - u.y() - v.x()};
+            u.x() * v.y() - u.y() * v.x()};
 }
 
 constexpr f64 Vec3::squared() const { return dot(*this, *this); }
