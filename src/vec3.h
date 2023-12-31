@@ -10,6 +10,8 @@
 
 class Vec3 {
    public:
+    static const Vec3 origin;
+
     static const Vec3 e_x;
     static const Vec3 e_y;
     static const Vec3 e_z;
@@ -79,6 +81,7 @@ class Vec3 {
     std::array<f64, 3> xyz_;
 };
 
+constexpr Vec3 Vec3::origin{0.0, 0.0, 0.0};
 constexpr Vec3 Vec3::e_x{1.0, 0.0, 0.0};
 constexpr Vec3 Vec3::e_y{0.0, 1.0, 0.0};
 constexpr Vec3 Vec3::e_z{0.0, 0.0, 1.0};
@@ -95,9 +98,7 @@ constexpr Vec3 operator+(const Vec3& u, const Vec3& v) {
     return out;
 }
 
-constexpr Vec3 operator-(const Vec3& u, const Vec3& v) {
-    return u + (-v);
-}
+constexpr Vec3 operator-(const Vec3& u, const Vec3& v) { return u + (-v); }
 
 constexpr Vec3 operator*(const Vec3& u, const Vec3& v) {
     return {u.x() * v.x(), u.y() * v.y(), u.z() * v.z()};
@@ -109,9 +110,7 @@ constexpr Vec3 operator*(f64 t, const Vec3& v) {
     return out;
 }
 
-constexpr Vec3 operator/(const Vec3& v, f64 t) {
-    return (1 / t) * v;
-}
+constexpr Vec3 operator/(const Vec3& v, f64 t) { return (1 / t) * v; }
 
 constexpr f64 dot(const Vec3& u, const Vec3& v) {
     Vec3 tmp = u * v;
@@ -123,21 +122,13 @@ constexpr Vec3 cross(const Vec3& u, const Vec3& v) {
             u.x() * v.y() - u.y() - v.x()};
 }
 
-constexpr f64 Vec3::squared() const {
-    return dot(*this, *this);
-}
+constexpr f64 Vec3::squared() const { return dot(*this, *this); }
 
-constexpr f64 Vec3::norm() const {
-    return std::sqrt(squared());
-}
+constexpr f64 Vec3::norm() const { return std::sqrt(squared()); }
 
-constexpr Vec3 Vec3::normed() const {
-    return *this / norm();
-}
+constexpr Vec3 Vec3::normed() const { return *this / norm(); }
 
-constexpr Vec3 Vec3::reflect(Vec3 normal) const {
-    return *this - 2 * dot(*this, normal) * normal;
-}
+constexpr Vec3 Vec3::reflect(Vec3 normal) const { return *this - 2 * dot(*this, normal) * normal; }
 
 constexpr Vec3 Vec3::refract(Vec3 normal, f64 eta) const {
     f64 cos_theta = dot(-*this, normal);
