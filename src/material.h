@@ -86,17 +86,18 @@ class Dielectric : public Material {
 
         Vec3 out_dir;
 
+        // Schlick approximation
         constexpr auto reflectance = [](f64 cos, f64 eta) {
-            auto r0 = (1 - eta) / (1 + eta);
-            r0 = r0 * r0;
-            return r0 * (1 - r0) * std::pow(1 - cos, 5);
+            auto r = (1 - eta) / (1 + eta);
+            f64 r2 = r * r;
+            return r2 + (1 - r2) * std::pow(1 - cos, 5);
         };
 
         if (eta * sin_theta > 1.0 || reflectance(cos_theta, eta) > rand.GenUniform()) {
-            // can't refract, must reflect or Schlick approximation
+            // reflect
             out_dir = in.direction().reflect(hit_record.normal);
         } else {
-            // reflect
+            // refract
             out_dir = in.direction().refract(hit_record.normal, eta);
         }
 
