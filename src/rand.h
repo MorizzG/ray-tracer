@@ -21,22 +21,22 @@ class RandomGen {
         return rand;
     }
 
-    constexpr u64 GenU64() { return philox_.Next(); }
+    constexpr u64 U64() { return philox_.Next(); }
     // constexpr u32 GenU32() { return static_cast<u32>(GenU64()); }
 
-    constexpr f64 GenUniform() { return philox_.NextF64(); }
+    constexpr f64 Uniform() { return philox_.NextF64(); }
 
-    constexpr f64 GenUniform(f64 min, f64 max) { return min + (max - min) * GenUniform(); }
+    constexpr f64 Uniform(f64 min, f64 max) { return min + (max - min) * Uniform(); }
 
-    constexpr Vec3 GenVec3() { return Vec3{GenUniform(), GenUniform(), GenUniform()}; }
+    constexpr Vec3 UniformVec3() { return Vec3{Uniform(), Uniform(), Uniform()}; }
 
-    constexpr Vec3 GenVec3(f64 min, f64 max) {
-        return Vec3{GenUniform(min, max), GenUniform(min, max), GenUniform(min, max)};
+    constexpr Vec3 UniformVec3(f64 min, f64 max) {
+        return Vec3{Uniform(min, max), Uniform(min, max), Uniform(min, max)};
     }
 
-    constexpr Vec3 GenInUnitBall() {
+    constexpr Vec3 UnitBallVec3() {
         while (true) {
-            Vec3 v = GenVec3(-1.0, 1.0);
+            Vec3 v = UniformVec3(-1.0, 1.0);
 
             if (v.norm() < 1.0) {
                 return v;
@@ -44,16 +44,27 @@ class RandomGen {
         }
     }
 
-    constexpr Vec3 GenOnUnitSphere() { return GenInUnitBall().normed(); }
+    constexpr Vec3 UnitSphereVec3() { return UnitBallVec3().normed(); }
 
-    constexpr Vec3 GenOnHemisphere(const Vec3& normal) {
-        Vec3 v = GenOnUnitSphere();
+    constexpr Vec3 HemisphereVec3(Vec3 normal) {
+        Vec3 v = UnitSphereVec3();
 
         if (dot(v, normal) < 0) {
             v = -v;
         }
 
         return v;
+    }
+
+    constexpr Vec3 UnitDiskVec3(Vec3 normal) {
+        while (true) {
+            Vec3 v = UniformVec3();
+            v -= dot(v, normal) * normal;
+
+            if (v.norm() < 1) {
+                return v;
+            }
+        }
     }
 
    private:

@@ -91,18 +91,22 @@ class Renderer {
 
    private:
     Ray SampleRay(u32 i, u32 j) {
-        auto pixel_centre = camera_.PixelToWorld(i, j);
-
         auto& rand = RandomGen::GenInstance();
 
-        Vec3 random_shift = rand.GenUniform(-0.5, 0.5) * camera_.d_u_pixel() +
-                            rand.GenUniform(-0.5, 0.5) * camera_.d_v_pixel();
+        auto ray_origin = camera_.centre();
 
-        pixel_centre += random_shift;
+        /* if (camera_.defocus_angle() > 0) {
+            ray_origin += camera_.defocus_radius() * rand.UnitDiskVec3(camera_.w());
+        } */
 
-        auto ray_direction = (pixel_centre - camera_.centre()).normed();
+        f64 x_dist = rand.Uniform(-0.5, 0.5);
+        f64 y_dist = rand.Uniform(-0.5, 0.5);
 
-        return Ray{camera_.centre(), ray_direction};
+        auto pixel_centre = camera_.PixelToWorld(i + x_dist, j + y_dist);
+
+        auto ray_direction = pixel_centre - camera_.centre();
+
+        return Ray{ray_origin, ray_direction};
     }
 
     constexpr Colour Cast(const Ray& ray, const RenderObject& world, u32 bounces) {

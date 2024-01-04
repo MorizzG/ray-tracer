@@ -39,10 +39,18 @@ class Vec3 {
         return xyz_[i];
     }
 
-    constexpr Vec3& operator+=(const Vec3& v) {
+    constexpr Vec3& operator+=(Vec3 v) {
         x() += v.x();
         y() += v.y();
         z() += v.z();
+
+        return *this;
+    }
+
+    constexpr Vec3& operator-=(Vec3 v) {
+        x() -= v.x();
+        y() -= v.y();
+        z() -= v.z();
 
         return *this;
     }
@@ -88,37 +96,35 @@ constexpr Vec3 Vec3::e_z{0.0, 0.0, 1.0};
 
 using Point3 = Vec3;
 
-constexpr std::ostream& operator<<(std::ostream& out, const Vec3& v) {
+constexpr std::ostream& operator<<(std::ostream& out, Vec3 v) {
     return out << v.x() << ' ' << v.y() << ' ' << v.z();
 }
 
-constexpr Vec3 operator+(const Vec3& u, const Vec3& v) {
+constexpr Vec3 operator+(Vec3 u, Vec3 v) {
     Vec3 out = u;
     out += v;
     return out;
 }
 
-constexpr Vec3 operator-(const Vec3& u, const Vec3& v) { return u + (-v); }
+constexpr Vec3 operator-(Vec3 u, Vec3 v) { return u + (-v); }
 
-constexpr Vec3 operator*(const Vec3& u, const Vec3& v) {
-    return {u.x() * v.x(), u.y() * v.y(), u.z() * v.z()};
-}
+constexpr Vec3 operator*(Vec3 u, Vec3 v) { return {u.x() * v.x(), u.y() * v.y(), u.z() * v.z()}; }
 
-constexpr Vec3 operator*(f64 t, const Vec3& v) {
+constexpr Vec3 operator*(f64 t, Vec3 v) {
     Vec3 out = v;
     out *= t;
     return out;
 }
 
-constexpr Vec3 operator/(const Vec3& v, f64 t) { return (1 / t) * v; }
+constexpr Vec3 operator/(Vec3 v, f64 t) { return (1 / t) * v; }
 
-constexpr f64 dot(const Vec3& u, const Vec3& v) {
+constexpr f64 dot(Vec3 u, Vec3 v) {
     Vec3 tmp = u * v;
     return tmp.x() + tmp.y() + tmp.z();
 }
 
-constexpr Vec3 cross(const Vec3& u, const Vec3& v) {
-    return {u.y() * v.z() - u.z() - v.y(), u.z() * v.x() - u.x() * v.z(),
+constexpr Vec3 cross(Vec3 u, Vec3 v) {
+    return {u.y() * v.z() - u.z() * v.y(), u.z() * v.x() - u.x() * v.z(),
             u.x() * v.y() - u.y() * v.x()};
 }
 

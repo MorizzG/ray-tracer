@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cassert>
-#include <cmath>
 #include <memory>
 #include <optional>
 
@@ -27,49 +26,50 @@ class Sphere : public RenderObject {
     std::optional<HitRecord> hit(const Ray& ray, Interval ts) const override {
         HitRecord hit_record{};
 
-        Vec3 oc = ray.origin() - centre_;
+        auto t_low_high = ray.HitSphere(centre_, radius_);
 
-        f64 a = ray.direction().squared();
-        f64 b_half = dot(oc, ray.direction());
-        f64 c = oc.squared() - radius_ * radius_;
-
-        f64 discr = b_half * b_half - a * c;
-
-        if (discr < 0) {
+        if (!t_low_high.has_value()) {
             // miss
             return std::nullopt;
         }
 
         // hit
+        auto [t_low, t_high] = t_low_high.value();
 
-        // smaller of the ts that hit the sphere
-        f64 t = (-b_half - std::sqrt(discr)) / a;
+        // we need to only distinguish 4 cases here:
+        // 1. t_low higher than interval automatically implies t_high is also higher than interval,
+        //    so return
+        // 2. t_low is in the interval, so return the t_low hit (t_high doesn't matter)
+        // 3. t_low is too low, t_high is in interval, so return t_high
+        // 4. both t_low is too low and t_high is too high
 
-        if (t >= ts.max()) {
+        if (t_low >= ts.max()) {
             // if the smaller t is already too large, we don't need to check the second one since it
             // will be even larger
 
             return std::nullopt;
         }
 
-        if (t <= ts.min()) {
+        if (t_low > ts.min()) {
+            // t_min is hit
+
+            hit_record.t = t_low;
+            // hit_record.front_face = true;
+        } else {
             // if the smaller t is too small, check the larger one
 
-            t = (-b_half + std::sqrt(discr)) / a;
-
-            if (!ts.surronds(t)) {
+            if (!ts.surronds(t_high)) {
                 // larger t also out of range: return false
 
                 return std::nullopt;
             }
 
-            // smaller t hits front side, smaller t hits back side
-            // TODO: what if our hit t is less than 0? is that case even relevant?
+            // t_low hits front side, t_high hits back side
+            hit_record.t = t_high;
             hit_record.front_face = false;
         }
 
-        hit_record.t = t;
-        hit_record.p = ray.At(t);
+        hit_record.p = ray.At(hit_record.t);
         hit_record.mat = mat_.get();
 
         if (hit_record.front_face) {

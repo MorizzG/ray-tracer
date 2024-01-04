@@ -36,7 +36,7 @@ class Lambertian : public Material {
 
     std::optional<std::tuple<Colour, Ray>> Scatter(const Ray& /* in */,
                                                    const HitRecord& hit_record) const override {
-        auto scatter_dir = hit_record.normal + RandomGen::GenInstance().GenOnUnitSphere();
+        auto scatter_dir = hit_record.normal + RandomGen::GenInstance().UnitSphereVec3();
 
         if (scatter_dir.almost_zero()) {
             scatter_dir = hit_record.normal;
@@ -59,7 +59,7 @@ class Metal : public Material {
                                                    const HitRecord& hit_record) const override {
         auto reflect_dir = in.direction().reflect(hit_record.normal).normed();
 
-        reflect_dir += fuzz_ * RandomGen::GenInstance().GenOnUnitSphere();
+        reflect_dir += fuzz_ * RandomGen::GenInstance().UnitSphereVec3();
 
         Ray scattered{hit_record.p, reflect_dir};
 
@@ -93,7 +93,7 @@ class Dielectric : public Material {
             return r2 + (1 - r2) * std::pow(1 - cos, 5);
         };
 
-        if (eta * sin_theta > 1.0 || reflectance(cos_theta, eta) > rand.GenUniform()) {
+        if (eta * sin_theta > 1.0 || reflectance(cos_theta, eta) > rand.Uniform()) {
             // reflect
             out_dir = in.direction().reflect(hit_record.normal);
         } else {
@@ -101,7 +101,7 @@ class Dielectric : public Material {
             out_dir = in.direction().refract(hit_record.normal, eta);
         }
 
-        out_dir += fuzz_ * rand.GenOnUnitSphere();
+        out_dir += fuzz_ * rand.UnitSphereVec3();
 
         Ray out{hit_record.p, out_dir};
 
