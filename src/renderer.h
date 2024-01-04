@@ -31,7 +31,7 @@ class Renderer {
     constexpr u32& max_bounces() { return max_bounces_; }
     constexpr u32 max_bounces() const { return max_bounces_; }
 
-    Image Render(const RenderObject& world) {
+    Image Render(const RenderObject& world) const {
         Image img{camera_.image_width(), camera_.image_height()};
 
         constexpr u32 kNumThreads = 16;
@@ -90,26 +90,27 @@ class Renderer {
     }
 
    private:
-    Ray SampleRay(u32 i, u32 j) {
+    Ray SampleRay(u32 i, u32 j) const {
         auto& rand = RandomGen::GenInstance();
 
         auto ray_origin = camera_.centre();
 
         /* if (camera_.defocus_angle() > 0) {
-            ray_origin += camera_.defocus_radius() * rand.UnitDiskVec3(camera_.w());
+            Vec3 r = rand.UnitDiskVec3();
+            ray_origin += camera_.defocus_radius() * (r.x() * camera_.u() + r.y() * camera_.v());
         } */
 
         f64 x_dist = rand.Uniform(-0.5, 0.5);
         f64 y_dist = rand.Uniform(-0.5, 0.5);
 
-        auto pixel_centre = camera_.PixelToWorld(i + x_dist, j + y_dist);
+        auto ray_target = camera_.PixelToWorld(i + x_dist, j + y_dist);
 
-        auto ray_direction = pixel_centre - camera_.centre();
+        auto ray_direction = ray_target - camera_.centre();
 
         return Ray{ray_origin, ray_direction};
     }
 
-    constexpr Colour Cast(const Ray& ray, const RenderObject& world, u32 bounces) {
+    constexpr Colour Cast(const Ray& ray, const RenderObject& world, u32 bounces) const {
         auto hit_record = world.hit(ray, Interval{0.001, kInf});
 
         // background
